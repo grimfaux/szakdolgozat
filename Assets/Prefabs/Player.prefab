@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 5312196368659954288}
   - component: {fileID: 7163807605361897735}
   - component: {fileID: 4119706272678726867}
+  - component: {fileID: 138356349166442041}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -104,13 +105,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2fd913908062c4db6e65d7273f8e0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
+  initMoveSpeed: 5
+  initRunSpeed: 10
   rotationSpeed: 10
+  gravity: 9.81
   playerHeight: 0
   whatIsGround:
     serializedVersion: 2
     m_Bits: 0
-  orientation: {fileID: 0}
+  orientation: {fileID: 5438858982022773176}
+  moveSpeed: 10
+--- !u!114 &138356349166442041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800337621532812278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f24e59e53f54fb4c8bcaa4ffd0841d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 100
+  maxHealth: 100
+  stamina: 50
+  maxStamina: 50
 --- !u!1 &6685027029311183579
 GameObject:
   m_ObjectHideFlags: 0
@@ -139,7 +159,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6685027029311183579}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.28470385, y: -3.878845e-16, z: 1.151997e-16, w: 0.95861554}
+  m_LocalRotation: {x: 0.28470388, y: 0, z: 0, w: 0.95861554}
   m_LocalPosition: {x: 0, y: 2.8440921, z: -4.365777}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -164,12 +184,12 @@ Camera:
   m_ShutterSpeed: 0.005
   m_Aperture: 16
   m_FocusDistance: 10
-  m_FocalLength: 50
+  m_FocalLength: 13.858139
   m_BladeCount: 5
   m_Curvature: {x: 2, y: 11}
   m_BarrelClipping: 0.25
   m_Anamorphism: 0
-  m_SensorSize: {x: 36, y: 24}
+  m_SensorSize: {x: 21.946, y: 16.002}
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2

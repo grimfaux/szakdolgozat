@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ThirdPersonCam : MonoBehaviour {
 
@@ -9,25 +10,34 @@ public class ThirdPersonCam : MonoBehaviour {
 
     public float rotationSpeed;
     
-    private PlayerControls controls;
-    private Vector2 moveInput;
+    private PlayerControls _controls;
+    private Vector2 _moveInput;
+    private InputAction _moveAction;
 
     private void Awake() {
-        controls = new PlayerControls();
+        _controls = new PlayerControls();
     }
     
     private void OnEnable() {
-        controls.Enable();
-        controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        controls.Player.Move.canceled += ctx => moveInput = Vector2.zero;
+        _controls.Enable();
+        _moveAction = _controls.Player.Move;
+        _moveAction.performed += OnMove;
+        _moveAction.canceled += OnMoveCancelled;
     }
 
     private void OnDisable() {
-        controls.Player.Move.performed -= ctx => moveInput = ctx.ReadValue<Vector2>();
-        controls.Player.Move.canceled -= ctx => moveInput = Vector2.zero;
-        controls.Disable();
+        _moveAction.performed -= OnMove;
+        _moveAction.canceled -= OnMoveCancelled;
+        _controls.Disable();
     }
-    
+
+    private void OnMoveCancelled(InputAction.CallbackContext ctx) {
+        _moveInput = Vector2.zero;
+    }
+
+    private void OnMove(InputAction.CallbackContext ctx) {
+        _moveInput = ctx.ReadValue<Vector2>();
+    }
     
     private void Start() {
         Cursor.lockState = CursorLockMode.Locked;
@@ -38,8 +48,8 @@ public class ThirdPersonCam : MonoBehaviour {
         Vector3 viewDir = player.position - new Vector3(transform.position.x, player.position.y, transform.position.z);
         orientation.forward = viewDir.normalized;
         
-        float horizontalInput = moveInput.x;
-        float verticalInput = moveInput.y;
+        float horizontalInput = _moveInput.x;
+        float verticalInput = _moveInput.y;
         Vector3 inputDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
         if (inputDir != Vector3.zero) {
