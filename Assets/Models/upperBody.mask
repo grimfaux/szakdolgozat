@@ -1,0 +1,229 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: upperBody
+  m_Mask: 00000000010000000100000000000000000000000100000001000000010000000100000000000000000000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Armature
+    m_Weight: 1
+  - m_Path: Armature/main controller
+    m_Weight: 1
+  - m_Path: Armature/main controller/arm IK L
+    m_Weight: 1
+  - m_Path: Armature/main controller/arm IK R
+    m_Weight: 1
+  - m_Path: Armature/main controller/elbow IK L
+    m_Weight: 1
+  - m_Path: Armature/main controller/elbow IK R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/neck lower
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/neck lower/neck
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/neck lower/neck/head
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/middle01 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/middle01 L/middle02 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/middle01 L/middle02 L/middle03 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/middle01 L/middle02 L/middle03 L/middle04 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/middle01 L/middle02 L/middle03 L/middle04 L/middle05 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/pinky01 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/pinky01 L/pinky02 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/pinky01 L/pinky02 L/pinky03 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/pinky01 L/pinky02 L/pinky03 L/pinky04 L
+    m_Weight: 1
+  - m_Path: 'Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/pinky01 L/pinky02 L/pinky03 L/pinky04 L/pinky05 L '
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/pointer01 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/pointer01 L/pointer02 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/pointer01 L/pointer02 L/pointer03 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/pointer01 L/pointer02 L/pointer03 L/pointer04 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/pointer01 L/pointer02 L/pointer03 L/pointer04 L/pointer05
+      L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/ring01 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/ring01 L/ring02 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/ring01 L/ring02 L/ring03 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/ring01 L/ring02 L/ring03 L/ring04 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/palm L/ring01 L/ring02 L/ring03 L/ring04 L/ring05 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/thumb01 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/thumb01 L/thumb02 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder L/upper arm L/lower
+      arm L/wrist L/thumb01 L/thumb02 L/thumb03 L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/middle01 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/middle01 R/middle02 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/middle01 R/middle02 R/middle03 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/middle01 R/middle02 R/middle03 R/middle04 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/middle01 R/middle02 R/middle03 R/middle04 R/middle05 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/pinky01 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/pinky01 R/pinky02 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/pinky01 R/pinky02 R/pinky03 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/pinky01 R/pinky02 R/pinky03 R/pinky04 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/pinky01 R/pinky02 R/pinky03 R/pinky04 R/pinky05 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/pointer01 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/pointer01 R/pointer02 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/pointer01 R/pointer02 R/pointer03 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/pointer01 R/pointer02 R/pointer03 R/pointer04 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/pointer01 R/pointer02 R/pointer03 R/pointer04 R/pointer05
+      R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/ring01 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/ring01 R/ring02 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/ring01 R/ring02 R/ring03 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/ring01 R/ring02 R/ring03 R/ring04 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/palm R/ring01 R/ring02 R/ring03 R/ring04 R/ring05 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/thumb01 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/thumb01 R/thumb02 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/spine/chest/shoulder R/upper arm R/lower
+      arm R/wrist R/thumb01 R/thumb02 R/thumb03 R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/upper leg L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/upper leg L/lower leg L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/upper leg L/lower leg L/ankle L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/upper leg L/lower leg L/ankle L/foot L
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/upper leg R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/upper leg R/lower leg R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/upper leg R/lower leg R/ankle R
+    m_Weight: 1
+  - m_Path: Armature/main controller/hip/upper leg R/lower leg R/ankle R/foot R
+    m_Weight: 1
+  - m_Path: Armature/main controller/leg IK L
+    m_Weight: 1
+  - m_Path: Armature/main controller/leg IK L/knee IK L
+    m_Weight: 1
+  - m_Path: Armature/main controller/leg IK R
+    m_Weight: 1
+  - m_Path: Armature/main controller/leg IK R/knee IK R
+    m_Weight: 1
+  - m_Path: Cube
+    m_Weight: 1
