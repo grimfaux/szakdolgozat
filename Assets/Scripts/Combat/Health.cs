@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Health : MonoBehaviour, IDamageable {
@@ -26,6 +27,7 @@ public class Health : MonoBehaviour, IDamageable {
     private static readonly int StaggerHash = Animator.StringToHash("stagger");
     private static readonly int DieHash = Animator.StringToHash("die");
 
+    private readonly HashSet<int> _triggers = new HashSet<int>();
     private float _health;
     private float _poise;
     private float _lastHitTime;
@@ -39,6 +41,16 @@ public class Health : MonoBehaviour, IDamageable {
         _health = maxHealth;
         _poise = maxPoise * DifficultyScaler.EnemyPoise;
         if (animator == null) animator = GetComponentInChildren<Animator>();
+        CacheTriggers();
+    }
+
+    private void CacheTriggers() {
+        _triggers.Clear();
+        if (animator == null || animator.runtimeAnimatorController == null) return;
+
+        foreach (AnimatorControllerParameter p in animator.parameters) {
+            if (p.type == AnimatorControllerParameterType.Trigger) _triggers.Add(p.nameHash);
+        }
     }
 
     private void Update() {
@@ -92,14 +104,9 @@ public class Health : MonoBehaviour, IDamageable {
     }
 
     // The enemy animator controller does not exist yet, so setting an unknown
-    // parameter would spam the console. Check before touching it.
+    // parameter would spam the console. The hashes are cached in Awake because
+    // reading animator.parameters allocates a fresh array on every call.
     private void SetTriggerIfPresent(int hash) {
-        if (animator == null) return;
-        foreach (AnimatorControllerParameter p in animator.parameters) {
-            if (p.nameHash == hash && p.type == AnimatorControllerParameterType.Trigger) {
-                animator.SetTrigger(hash);
-                return;
-            }
-        }
+        if (animator != null && _triggers.Contains(hash)) animator.SetTrigger(hash);
     }
 }

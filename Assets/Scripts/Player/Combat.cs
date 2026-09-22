@@ -1,50 +1,53 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(EquipmentSystem))]
 public class Combat : MonoBehaviour {
-    
-    public Animator playerAnimator;
-    private PlayerControls _controls;
-    
-    private bool isEquipped = false;
-    private bool moving = false;     
+    [SerializeField] private Animator playerAnimator;
+
+    private EquipmentSystem _equipment;
 
     private void Awake() {
-        playerAnimator = GetComponent<Animator>();
-        _controls = new PlayerControls();
+        if (playerAnimator == null) playerAnimator = GetComponentInChildren<Animator>();
+        _equipment = GetComponent<EquipmentSystem>();
     }
 
     private void OnEnable() {
-        _controls.Enable();
-        _controls.Player.Equip.performed += OnEquip;
-        _controls.Player.LightAttack.performed += OnLightAttack;
-    }
-
-    private void OnLightAttack(InputAction.CallbackContext obj) {
-        if (isEquipped && !playerAnimator.GetBool("isAttacking")) {
-            Debug.Log(playerAnimator.GetCurrentAnimatorStateInfo(1).fullPathHash);
-            playerAnimator.SetBool("isAttacking", true);
-            playerAnimator.SetTrigger("attack");
-        }
-    }
-
-    private void OnEquip(InputAction.CallbackContext obj) {
-        if (moving) {
-            playerAnimator.SetTrigger(isEquipped ? "unequipUpper" : "equipUpper");
-        } else {
-            playerAnimator.SetTrigger(isEquipped ? "unequipFull" : "equipFull");
-        }
-        isEquipped = !isEquipped;
+        PlayerInputs.Acquire();
+        PlayerInputs.Controls.Player.Equip.performed += OnEquip;
+        PlayerInputs.Controls.Player.LightAttack.performed += OnLightAttack;
     }
 
     private void OnDisable() {
-        _controls.Disable();
+        PlayerInputs.Controls.Player.Equip.performed -= OnEquip;
+        PlayerInputs.Controls.Player.LightAttack.performed -= OnLightAttack;
+        PlayerInputs.Release();
     }
 
-    void Update() {
-        if (isEquipped) playerAnimator.SetTrigger("enterCombat");
-        
-        moving = playerAnimator.GetFloat("speed") > 0.001f;
+    private void OnLightAttack(InputAction.CallbackContext context) {
+        if (!_equipment.IsEquipped || _equipment.IsSwapping) return;
+        if (playerAnimator.GetBool(PlayerAnimatorParams.IsAttacking)) return;
+
+        playerAnimator.SetBool(PlayerAnimatorParams.IsAttacking, true);
+        playerAnimator.SetTrigger(PlayerAnimatorParams.Attack);
+    }
+
+    private void OnEquip(InputAction.CallbackContext context) {
+        if (_equipment.IsSwapping) return;
+        if (playerAnimator.GetBool(PlayerAnimatorParams.IsAttacking)) return;
+
+        bool moving = playerAnimator.GetFloat(PlayerAnimatorParams.Speed) > 0.001f;
+        bool equipped = _equipment.IsEquipped;
+
+        if (moving) {
+            playerAnimator.SetTrigger(equipped ? PlayerAnimatorParams.UnequipUpper : PlayerAnimatorParams.EquipUpper);
+        } else {
+            playerAnimator.SetTrigger(equipped ? PlayerAnimatorParams.UnequipFull : PlayerAnimatorParams.EquipFull);
+        }
+
+        // enterCombat is a trigger, so it fires once per draw rather than every frame.
+        if (!equipped) playerAnimator.SetTrigger(PlayerAnimatorParams.EnterCombat);
+
+        _equipment.BeginSwap();
     }
 }

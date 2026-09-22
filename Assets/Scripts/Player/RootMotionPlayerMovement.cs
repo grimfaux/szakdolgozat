@@ -1,15 +1,19 @@
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
-public class RootMotionPlayerMovement : MonoBehaviour
-{
+[RequireComponent(typeof(PlayerInfo))]
+public class RootMotionPlayerMovement : MonoBehaviour {
     [Header("Movement Settings")]
     public float initMoveSpeed = 5f;
     public float initRunSpeed = 10f;
     public float rotationSpeed = 10f;
     public float gravity = 9.81f;
+
+    [Header("Stamina")]
+    public float runStaminaPerSecond = 5f;
+    public float staminaRegenPerSecond = 5f;
 
     [Header("Dodge")]
     public float dodgeDistance = 4f;
@@ -20,63 +24,97 @@ public class RootMotionPlayerMovement : MonoBehaviour
     [Tooltip("Let a root motion dodge clip drive the movement instead of a manual slide.")]
     public bool useRootMotionForDodge;
 
-    [Header("GroundCheck")]
-    public float playerHeight = 2f;
-    public LayerMask whatIsGround;
-
     [Header("References")]
     public Transform orientation;
     public Animator playerAnimator;
 
     private CharacterController _controller;
-    private PlayerControls _controls;
     private PlayerInfo _playerInfo;
 
     private Vector2 _moveInput;
     private Vector3 _moveDirection;
-    private Vector3 _velocity;
+    private float _inputMagnitude;
+    private float _verticalVelocity;
+    private float _currentSpeed;
 
+    private readonly HashSet<int> _triggers = new HashSet<int>();
     private bool _isRunning;
-    private bool _isDashing;
-    private float moveSpeed;
+    private float _dodgeTimeLeft;
+    private Vector3 _dodgeDirection;
 
-    private bool _grounded;
+    public bool IsDodging => _dodgeTimeLeft > 0f;
+    private bool IsAttacking => playerAnimator.GetBool(PlayerAnimatorParams.IsAttacking);
 
     private void Awake() {
         _controller = GetComponent<CharacterController>();
-        playerAnimator = GetComponent<Animator>();
         _playerInfo = GetComponent<PlayerInfo>();
-        _controls = new PlayerControls();
+        if (playerAnimator == null) playerAnimator = GetComponentInChildren<Animator>();
 
-        moveSpeed = initMoveSpeed;
+        if (playerAnimator != null && playerAnimator.runtimeAnimatorController != null) {
+            foreach (AnimatorControllerParameter p in playerAnimator.parameters) {
+                if (p.type == AnimatorControllerParameterType.Trigger) _triggers.Add(p.nameHash);
+            }
+        }
     }
 
     private void OnEnable() {
-        _controls.Enable();
-        _controls.Player.Move.performed += ctx => _moveInput = ctx.ReadValue<Vector2>();
-        _controls.Player.Move.canceled += ctx => _moveInput = Vector2.zero;
-        _controls.Player.Run.performed += OnRunPressed;
-        _controls.Player.Run.canceled += OnRunReleased;
-        _controls.Player.Dash.performed += OnDashPressed;
+        PlayerInputs.Acquire();
+        PlayerControls.PlayerActions player = PlayerInputs.Controls.Player;
+        player.Move.performed += OnMove;
+        player.Move.canceled += OnMove;
+        player.Run.performed += OnRunPressed;
+        player.Run.canceled += OnRunReleased;
+        player.Dash.performed += OnDashPressed;
     }
 
     private void OnDisable() {
-        _controls.Disable();
+        PlayerControls.PlayerActions player = PlayerInputs.Controls.Player;
+        player.Move.performed -= OnMove;
+        player.Move.canceled -= OnMove;
+        player.Run.performed -= OnRunPressed;
+        player.Run.canceled -= OnRunReleased;
+        player.Dash.performed -= OnDashPressed;
+        PlayerInputs.Release();
     }
 
     private void Update() {
-        CheckGrounded();
-        ApplyGravity();
-        HandlePlayerInfo();
-        HandleMovement();
+        float dt = Time.deltaTime;
 
-        playerAnimator.SetFloat("speed", _moveDirection.magnitude * moveSpeed);
+        ReadMoveDirection();
+        UpdateStamina(dt);
+
+        Vector3 motion = Vector3.zero;
+
+        if (IsDodging) {
+            _dodgeTimeLeft -= dt;
+            _currentSpeed = 0f;
+            if (!useRootMotionForDodge && dodgeDuration > 0f) {
+                motion = _dodgeDirection * (dodgeDistance / dodgeDuration);
+            }
+        } else if (IsAttacking) {
+            _currentSpeed = 0f;
+        } else {
+            _currentSpeed = _isRunning ? initRunSpeed : initMoveSpeed;
+            motion = _moveDirection * (_currentSpeed * _inputMagnitude);
+            RotateTowardsMovement(dt);
+        }
+
+        ApplyGravity(dt);
+        motion.y = _verticalVelocity;
+
+        // One Move per frame keeps collision resolution predictable.
+        _controller.Move(motion * dt);
+
+        playerAnimator.SetFloat(PlayerAnimatorParams.Speed, _currentSpeed * _inputMagnitude);
     }
 
     #region Input Callbacks
+    private void OnMove(InputAction.CallbackContext context) {
+        _moveInput = context.ReadValue<Vector2>();
+    }
+
     private void OnRunPressed(InputAction.CallbackContext context) {
-        if (_playerInfo.Stamina > 0)
-            _isRunning = true;
+        if (_playerInfo.Stamina > 0f) _isRunning = true;
     }
 
     private void OnRunReleased(InputAction.CallbackContext context) {
@@ -84,104 +122,72 @@ public class RootMotionPlayerMovement : MonoBehaviour
     }
 
     private void OnDashPressed(InputAction.CallbackContext context) {
-        if (_isDashing) return;
-        if (playerAnimator.GetBool("isAttacking")) return;
+        if (IsDodging || IsAttacking) return;
         if (!_playerInfo.TrySpendStamina(dodgeStaminaCost)) return;
 
-        StartCoroutine(DashRoutine());
+        _dodgeDirection = _moveDirection != Vector3.zero ? _moveDirection : transform.forward;
+        _dodgeDirection.y = 0f;
+        _dodgeDirection.Normalize();
+        transform.rotation = Quaternion.LookRotation(_dodgeDirection);
+
+        _dodgeTimeLeft = dodgeDuration;
+        _playerInfo.GrantInvulnerability(dodgeInvulnerability);
+        SetTriggerIfPresent(PlayerAnimatorParams.Dodge);
     }
     #endregion
 
     #region Movement
-    private void HandleMovement() {
-        if (_isDashing) return;
+    private void ReadMoveDirection() {
+        Vector3 raw = orientation.forward * _moveInput.y + orientation.right * _moveInput.x;
+        raw.y = 0f;
 
-        if (playerAnimator.GetBool("isAttacking")) {
-            _moveDirection = Vector3.zero;
-            return;
-        }
+        _inputMagnitude = Mathf.Clamp01(raw.magnitude);
+        _moveDirection = raw.sqrMagnitude > 0.0001f ? raw.normalized : Vector3.zero;
+    }
 
-        _moveDirection = orientation.forward * _moveInput.y + orientation.right * _moveInput.x;
+    private void RotateTowardsMovement(float dt) {
+        if (_moveDirection == Vector3.zero) return;
 
-        moveSpeed = _isRunning ? initRunSpeed : initMoveSpeed;
-
-        _controller.Move(_moveDirection.normalized * (moveSpeed * Time.deltaTime));
-
-        if (_moveDirection != Vector3.zero) {
-            Quaternion targetRotation = Quaternion.LookRotation(_moveDirection.normalized);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        }
+        Quaternion target = Quaternion.LookRotation(_moveDirection);
+        transform.rotation = Quaternion.Slerp(transform.rotation, target, rotationSpeed * dt);
     }
 
     private void OnAnimatorMove() {
-        if (playerAnimator.GetBool("isAttacking") || (_isDashing && useRootMotionForDodge)) {
-            Vector3 rootMotion = playerAnimator.deltaPosition;
-            rootMotion.y = 0;
-            _controller.Move(rootMotion);
+        if (!IsAttacking && !(IsDodging && useRootMotionForDodge)) return;
 
-            transform.rotation *= playerAnimator.deltaRotation;
+        Vector3 rootMotion = playerAnimator.deltaPosition;
+        rootMotion.y = 0f;
+        _controller.Move(rootMotion);
+
+        transform.rotation *= playerAnimator.deltaRotation;
+    }
+    #endregion
+
+    #region Gravity
+    private void ApplyGravity(float dt) {
+        if (_controller.isGrounded && _verticalVelocity < 0f) {
+            _verticalVelocity = -2f;
+        } else {
+            _verticalVelocity -= gravity * dt;
         }
     }
     #endregion
 
-    #region Gravity & Ground
-    private void CheckGrounded() {
-        _grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
-    }
+    #region Stamina
+    private void UpdateStamina(float dt) {
+        bool sprinting = _isRunning && _inputMagnitude > 0.1f && !IsDodging;
 
-    private void ApplyGravity() {
-        if (_grounded && _velocity.y < 0)
-            _velocity.y = -2f;
-
-        _velocity.y -= gravity * Time.deltaTime;
-        _controller.Move(_velocity * Time.deltaTime);
+        if (sprinting) {
+            _playerInfo.DecreaseStamina(runStaminaPerSecond * dt);
+            if (_playerInfo.Stamina <= 0f) _isRunning = false;
+        } else {
+            _playerInfo.RegenStamina(staminaRegenPerSecond * dt);
+        }
     }
     #endregion
-
-    #region Player Info (Stamina)
-    private void HandlePlayerInfo() {
-        if (_isRunning) {
-            _playerInfo.DecreaseStamina(5f * Time.deltaTime);
-            if (_playerInfo.Stamina <= 0)
-                _isRunning = false;
-        }
-        else {
-            _playerInfo.RegenStamina(5f * Time.deltaTime);
-        }
-    }
-
-    private IEnumerator DashRoutine() {
-        _isDashing = true;
-        _playerInfo.GrantInvulnerability(dodgeInvulnerability);
-        SetTriggerIfPresent("dodge");
-
-        Vector3 direction = _moveDirection.sqrMagnitude > 0.001f ? _moveDirection.normalized : transform.forward;
-        direction.y = 0f;
-        if (direction != Vector3.zero) transform.rotation = Quaternion.LookRotation(direction);
-
-        float elapsed = 0f;
-        float speed = dodgeDuration > 0f ? dodgeDistance / dodgeDuration : 0f;
-
-        while (elapsed < dodgeDuration) {
-            if (!useRootMotionForDodge) {
-                _controller.Move(direction * (speed * Time.deltaTime));
-            }
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        _isDashing = false;
-    }
 
     // The animator has no dodge parameter yet; setting an unknown one spams the console.
-    private void SetTriggerIfPresent(string parameterName) {
-        foreach (AnimatorControllerParameter p in playerAnimator.parameters) {
-            if (p.name == parameterName && p.type == AnimatorControllerParameterType.Trigger) {
-                playerAnimator.SetTrigger(parameterName);
-                return;
-            }
-        }
+    private void SetTriggerIfPresent(int hash) {
+        if (_triggers.Contains(hash)) playerAnimator.SetTrigger(hash);
     }
-    #endregion
 }
-
