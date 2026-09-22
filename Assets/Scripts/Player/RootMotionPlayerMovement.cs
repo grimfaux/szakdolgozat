@@ -11,6 +11,15 @@ public class RootMotionPlayerMovement : MonoBehaviour
     public float rotationSpeed = 10f;
     public float gravity = 9.81f;
 
+    [Header("Dodge")]
+    public float dodgeDistance = 4f;
+    public float dodgeDuration = 0.25f;
+    public float dodgeStaminaCost = 25f;
+    [Tooltip("How long the player ignores damage after the dodge starts.")]
+    public float dodgeInvulnerability = 0.35f;
+    [Tooltip("Let a root motion dodge clip drive the movement instead of a manual slide.")]
+    public bool useRootMotionForDodge;
+
     [Header("GroundCheck")]
     public float playerHeight = 2f;
     public LayerMask whatIsGround;
@@ -75,13 +84,18 @@ public class RootMotionPlayerMovement : MonoBehaviour
     }
 
     private void OnDashPressed(InputAction.CallbackContext context) {
-        if (_playerInfo.Stamina > 0)
-            StartCoroutine(DashRoutine());
+        if (_isDashing) return;
+        if (playerAnimator.GetBool("isAttacking")) return;
+        if (!_playerInfo.TrySpendStamina(dodgeStaminaCost)) return;
+
+        StartCoroutine(DashRoutine());
     }
     #endregion
 
     #region Movement
     private void HandleMovement() {
+        if (_isDashing) return;
+
         if (playerAnimator.GetBool("isAttacking")) {
             _moveDirection = Vector3.zero;
             return;
@@ -100,7 +114,7 @@ public class RootMotionPlayerMovement : MonoBehaviour
     }
 
     private void OnAnimatorMove() {
-        if (playerAnimator.GetBool("isAttacking")) {
+        if (playerAnimator.GetBool("isAttacking") || (_isDashing && useRootMotionForDodge)) {
             Vector3 rootMotion = playerAnimator.deltaPosition;
             rootMotion.y = 0;
             _controller.Move(rootMotion);
@@ -138,9 +152,35 @@ public class RootMotionPlayerMovement : MonoBehaviour
 
     private IEnumerator DashRoutine() {
         _isDashing = true;
-        _playerInfo.DecreaseStamina(40f);
-        yield return new WaitForSeconds(0.2f);
+        _playerInfo.GrantInvulnerability(dodgeInvulnerability);
+        SetTriggerIfPresent("dodge");
+
+        Vector3 direction = _moveDirection.sqrMagnitude > 0.001f ? _moveDirection.normalized : transform.forward;
+        direction.y = 0f;
+        if (direction != Vector3.zero) transform.rotation = Quaternion.LookRotation(direction);
+
+        float elapsed = 0f;
+        float speed = dodgeDuration > 0f ? dodgeDistance / dodgeDuration : 0f;
+
+        while (elapsed < dodgeDuration) {
+            if (!useRootMotionForDodge) {
+                _controller.Move(direction * (speed * Time.deltaTime));
+            }
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
         _isDashing = false;
+    }
+
+    // The animator has no dodge parameter yet; setting an unknown one spams the console.
+    private void SetTriggerIfPresent(string parameterName) {
+        foreach (AnimatorControllerParameter p in playerAnimator.parameters) {
+            if (p.name == parameterName && p.type == AnimatorControllerParameterType.Trigger) {
+                playerAnimator.SetTrigger(parameterName);
+                return;
+            }
+        }
     }
     #endregion
 }
