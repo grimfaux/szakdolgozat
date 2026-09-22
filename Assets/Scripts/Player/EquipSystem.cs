@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class EquipmentSystem : MonoBehaviour {
@@ -7,34 +6,53 @@ public class EquipmentSystem : MonoBehaviour {
     [SerializeField] private GameObject weaponSheath;
     public Animator playerAnimator;
 
-    
     private GameObject currentWeaponInHand;
     private GameObject currentWeaponInSheath;
     private bool isEquipped = false;
 
+    public bool IsEquipped => isEquipped;
+
     void Start() {
-        playerAnimator = GetComponent<Animator>();
-        currentWeaponInSheath = Instantiate(weapon, weaponSheath.transform);
+        if (playerAnimator == null) playerAnimator = GetComponent<Animator>();
+        if (weapon != null && weaponSheath != null) {
+            currentWeaponInSheath = Instantiate(weapon, weaponSheath.transform);
+        }
     }
 
+    // Animation event on the Sword_Enter / Sword_Exit clips.
     public void EquipWeapon() {
+        if (weapon == null) return;
+
         if (!isEquipped) {
+            if (weaponHolder == null) return;
             currentWeaponInHand = Instantiate(weapon, weaponHolder.transform);
-            Destroy(currentWeaponInSheath);
+            if (currentWeaponInSheath != null) Destroy(currentWeaponInSheath);
         } else {
+            if (weaponSheath == null) return;
             currentWeaponInSheath = Instantiate(weapon, weaponSheath.transform);
-            Destroy(currentWeaponInHand);
+            if (currentWeaponInHand != null) Destroy(currentWeaponInHand);
         }
         isEquipped = !isEquipped;
     }
 
+    // Animation events on the attack clip.
     public void StartDealDamage() {
-        currentWeaponInHand.GetComponentInChildren<DamageDealer>().StartDealDamage();
+        DamageDealer dealer = GetHeldDamageDealer();
+        if (dealer != null) dealer.StartDealDamage();
     }
 
     public void EndDealDamage() {
-        currentWeaponInHand.GetComponentInChildren<DamageDealer>().EndDealDamage();
-        playerAnimator.SetBool("isAttacking", false);
-        playerAnimator.SetTrigger("move");
+        DamageDealer dealer = GetHeldDamageDealer();
+        if (dealer != null) dealer.EndDealDamage();
+
+        if (playerAnimator != null) {
+            playerAnimator.SetBool("isAttacking", false);
+            playerAnimator.SetTrigger("move");
+        }
+    }
+
+    private DamageDealer GetHeldDamageDealer() {
+        if (currentWeaponInHand == null) return null;
+        return currentWeaponInHand.GetComponentInChildren<DamageDealer>();
     }
 }
